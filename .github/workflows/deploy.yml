@@ -1,3 +1,4 @@
+
 name: Deploy to AWS ECS
 
 on:
@@ -6,9 +7,8 @@ on:
       - main
 
 env:
-  AWS_REGION: u-east-2
-  AWS_DEFAULT_REGION: us-east-2
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: pd_api
   ECS_CLUSTER: pd-api-cluster_new
   ECS_SERVICE: pd-api-task-service-ua1803ml
   CONTAINER_NAME: pd-api-container
@@ -28,7 +28,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-          aws-default-region: us-east-2
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -48,9 +47,8 @@ jobs:
 
       - name: Force new deployment in ECS
         run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment --region ${{ env.AWS_REGION }}
+          aws ecs update-service --cluster pd-api-cluster_new --service pd-api-task-service-ua1803ml --force-new-deployment --region us-east-2
 
       - name: Wait for service stability
         run: |
-          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --region ${{ env.AWS_REGION }}rks
-          
+          aws ecs wait services-stable --cluster pd-api-cluster_new --services pd-api-task-service-ua1803ml --region us-east-2
